@@ -112,7 +112,8 @@ wss.on('connection', (ws) => {
           cratesOpened: myRoom.cratesOpened,
           structures: myRoom.structures,
           started: myRoom.started,
-          stormRadius: myRoom.stormRadius
+          stormRadius: myRoom.stormRadius,
+          mode: myRoom.mode || 'br'
         });
 
         // Notify others
@@ -195,9 +196,11 @@ wss.on('connection', (ws) => {
         if (!p || !p.isHost) break;
         myRoom.started = true;
         myRoom.startTime = Date.now();
-        broadcast(myRoom, { type: 'gameStart' });
-        send(ws, { type: 'gameStart' });
-        console.log(`[${myRoom.code}] Game started with ${Object.keys(myRoom.players).length} players`);
+        myRoom.mode = msg.mode || 'br'; // save mode in room
+        const startMsg = { type: 'gameStart', mode: myRoom.mode };
+        broadcast(myRoom, startMsg);
+        send(ws, startMsg);
+        console.log(`[${myRoom.code}] Game started — mode: ${myRoom.mode}, players: ${Object.keys(myRoom.players).length}`);
         break;
       }
 
